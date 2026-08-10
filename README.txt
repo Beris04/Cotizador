@@ -1,15 +1,28 @@
-COTIZADOR TOYO FOODS - GITHUB PAGES
+COTIZADOR TOYO FOODS V5 - GITHUB PAGES
 
-1. Sube el archivo index.html directamente a la raíz de tu repositorio.
-2. En GitHub ve a Settings > Pages.
-3. En Build and deployment selecciona:
-   Source: Deploy from a branch
-   Branch: main
-   Folder: / (root)
-4. Guarda los cambios.
-5. Espera unos minutos y abre la URL que GitHub Pages te muestre.
+ARCHIVO PRINCIPAL
+- index.html
 
-IMPORTANTE:
-- No cambies el nombre index.html.
-- Debe estar en la raíz del repositorio, no dentro de otra carpeta.
-- La app ya incluye productos, clientes y logo dentro del propio HTML.
+ACCESO
+- Solo solicita contraseña.
+- Contraseña configurada: TOYO2026
+- La sesión permanece abierta mientras la pestaña/sesión del navegador siga activa.
+
+COTIZACIONES
+- Compartir imagen: genera PNG de la cotización y, en celulares compatibles,
+  abre el menú nativo para enviarla por WhatsApp, correo, etc.
+- Si la cotización tiene muchas partidas, genera varias imágenes/páginas.
+- PDF / imprimir: utiliza la impresión del navegador para guardar o compartir PDF.
+- Vista previa: mantiene el formato formal Toyo Foods.
+
+GITHUB PAGES
+1. Sube index.html a la raíz del repositorio.
+2. Settings > Pages.
+3. Source: Deploy from a branch.
+4. Branch: main.
+5. Folder: / (root).
+6. Guarda y espera a que GitHub publique.
+
+NOTA DE SEGURIDAD
+La contraseña es una barrera de acceso del lado del navegador para un sitio estático.
+No sustituye autenticación de servidor para información altamente sensible.
