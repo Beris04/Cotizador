@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e3a6d">
+<title>Toyo Foods · Cotizador</title>
+<style>
+:root{
+  --navy:#0e3a6d;--navy2:#14518f;--blue:#1f6feb;--sky:#eaf3ff;--bg:#f3f6fa;
+  --card:#fff;--text:#182738;--muted:#728299;--line:#dde5ee;--green:#0b9369;
+  --red:#d64545;--shadow:0 10px 28px rgba(15,47,78,.12);--safe:env(safe-area-inset-bottom,0px)
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.app{min-height:100vh;padding-bottom:88px}
+
+/* Login */
+.gate{position:fixed;inset:0;z-index:500;background:linear-gradient(145deg,#08213d,#14518f);display:grid;place-items:center;padding:22px}
+.gateCard{width:min(100%,380px);background:#fff;border-radius:24px;padding:25px 20px 20px;text-align:center;box-shadow:0 30px 70px #00162c66}
+.gateCard img{width:92px;height:92px;object-fit:contain;border-radius:20px}
+.gateCard h1{font-size:22px;margin:10px 0 5px;color:var(--navy)}
+.gateCard p{font-size:11px;color:var(--muted);margin:0 0 17px}
+.pass{position:relative}.pass input{width:100%;border:1px solid var(--line);border-radius:13px;padding:14px 48px 14px 14px;text-align:center;font-size:16px;outline:none}
+.pass button{position:absolute;right:7px;top:6px;width:36px;height:36px;border:0;border-radius:9px;background:#edf3f8}
+.enter{width:100%;border:0;border-radius:13px;background:var(--blue);color:#fff;padding:13px;font-weight:900;margin-top:10px}
+.err{min-height:18px;color:var(--red);font-size:10px;font-weight:800;margin-top:8px}
+
+/* Header */
+.header{position:sticky;top:0;z-index:40;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:12px 13px 13px;box-shadow:0 4px 18px #0b2c5130}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brandL{display:flex;gap:9px;align-items:center}.brandL img{width:43px;height:43px;border-radius:11px;background:#fff;object-fit:contain}
+.brandL b{font-size:16px;display:block}.brandL small{display:block;font-size:9px;opacity:.8;margin-top:2px}
+.modeBtn{border:1px solid #ffffff55;background:#ffffff16;color:#fff;border-radius:11px;padding:8px 10px;font-size:10px;font-weight:900}
+.search{position:relative;margin-top:11px}.search input{width:100%;border:0;border-radius:14px;padding:13px 44px 13px 13px;font-size:15px;outline:none;box-shadow:0 5px 16px #001b3520}
+.search span{position:absolute;right:14px;top:11px;color:#718399;font-size:20px}
+.chips{display:flex;gap:7px;overflow:auto;margin-top:9px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;border:1px solid #ffffff40;background:#ffffff13;color:#fff;border-radius:999px;padding:7px 10px;font-size:9px;font-weight:900}
+.chip.active{background:#fff;color:var(--navy)}
+
+/* Catalog */
+.content{padding:11px}
+.meta{display:flex;justify-content:space-between;align-items:center;padding:3px 2px 7px}.meta b{font-size:12px}.meta span{font-size:9px;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:8px}
+.product{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;box-shadow:0 3px 10px #15324f08}
+.pcode{font-size:9px;color:var(--blue);font-weight:900}.pname{font-size:13px;font-weight:800;line-height:1.3;margin-top:4px}
+.priceRow{display:flex;gap:7px;align-items:baseline;flex-wrap:wrap;margin-top:8px}.price{font-size:16px;font-weight:900;color:var(--navy)}.alt{font-size:8px;color:var(--muted)}
+.add{width:45px;height:45px;align-self:center;border:0;border-radius:13px;background:var(--sky);color:var(--blue);font-size:24px;font-weight:700}
+.more{display:block;margin:15px auto 20px;border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:12px;padding:10px 18px;font-weight:900}
+.empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:12px}
+
+/* Bottom cart bar */
+.cartBar{position:fixed;left:9px;right:9px;bottom:calc(9px + var(--safe));z-index:50;background:var(--navy);color:#fff;border-radius:16px;padding:10px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;box-shadow:0 16px 35px #0a2a4f55}
+.cartBar b{display:block;font-size:12px}.cartBar small{display:block;font-size:9px;opacity:.76;margin-top:2px}.cartBar button{border:0;background:#fff;color:var(--navy);border-radius:11px;padding:10px 12px;font-size:11px;font-weight:900}
+
+/* Quote drawer */
+.drawer{position:fixed;inset:0;background:#0007;z-index:90;display:none}.drawer.open{display:block}
+.panel{position:absolute;inset:0;background:#fff;overflow:auto;padding-bottom:150px}
+.panelHead{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.panelHead h2{font-size:18px;margin:0}.panelHead small{font-size:9px;color:var(--muted)}.close{width:38px;height:38px;border:0;border-radius:11px;background:#eef3f8;font-size:17px}
+.qbody{padding:11px 14px}.section{padding:11px 0;border-bottom:1px solid var(--line)}.stitle{font-size:9px;color:#8492a4;font-weight:900;letter-spacing:.6px;margin-bottom:8px}
+.clientBtn{width:100%;border:1px dashed #9bb2ca;background:#f7fbff;color:var(--navy);border-radius:13px;padding:13px;text-align:left;display:flex;justify-content:space-between;align-items:center;font-weight:900}
+.clientBtn small{display:block;font-size:8px;color:var(--muted);font-weight:600;margin-top:3px}
+.clientCard{border:1px solid #dbe7f2;background:#f8fbff;border-radius:13px;padding:11px}
+.clientTop{display:flex;justify-content:space-between;gap:9px}.clientTop strong{font-size:12px;line-height:1.3}.commercial{font-size:10px;color:var(--blue);font-weight:900;margin-top:2px}
+.change{border:0;background:var(--sky);color:var(--blue);border-radius:9px;padding:7px 9px;font-size:8px;font-weight:900;white-space:nowrap}
+.cmeta{display:grid;grid-template-columns:1fr 1fr;gap:5px 10px;margin-top:9px}.cmeta div{font-size:8px;color:#617287;line-height:1.3}.cmeta b{display:block;color:#293b50;font-size:8px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.form .wide{grid-column:1/-1}
+.form input,.form select,.form textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11px;background:#fff;outline:none}.form textarea{min-height:65px;resize:vertical}
+.qitems{display:flex;flex-direction:column;gap:7px}.qitem{border:1px solid #edf1f5;border-radius:12px;padding:10px;display:grid;grid-template-columns:1fr auto;gap:8px}
+.qitem b{display:block;font-size:10px;line-height:1.3}.qitem small{display:block;font-size:8px;color:var(--muted);margin-top:3px}
+.qty{display:flex;align-items:center;gap:4px}.qty button{width:29px;height:29px;border:1px solid var(--line);border-radius:8px;background:#fff}.qty .rm{color:var(--red)}
+.calc{padding:13px 0}.crow{display:flex;justify-content:space-between;align-items:center;font-size:11px;margin:7px 0}.crow.total{font-size:22px;font-weight:900;color:var(--navy);padding-top:5px}.disc{width:58px;border:1px solid var(--line);border-radius:8px;padding:5px;text-align:right}
+.actions{position:fixed;left:0;right:0;bottom:0;z-index:100;background:#fff;border-top:1px solid var(--line);padding:8px 9px calc(8px + var(--safe));display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.actions button{border:0;border-radius:11px;padding:11px 7px;font-size:10px;font-weight:900}.new{background:#eef2f6;color:var(--navy)}.preview{background:var(--sky);color:var(--blue)}.share{background:var(--green);color:#fff}.pdf{background:var(--blue);color:#fff}
+
+/* Client selector */
+.clientOverlay{position:fixed;inset:0;background:#fff;z-index:140;display:none;flex-direction:column}.clientOverlay.open{display:flex}
+.cHead{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:12px 12px 14px}.cTop{display:flex;gap:9px;align-items:center}.cTop button{width:38px;height:38px;border:0;border-radius:11px;background:#ffffff18;color:#fff}.cTop b{font-size:16px}.cTop small{display:block;font-size:8px;opacity:.8;margin-top:2px}
+.cSearch{position:relative;margin-top:10px}.cSearch input{width:100%;border:0;border-radius:13px;padding:13px 42px 13px 13px;font-size:15px;outline:none}.cSearch span{position:absolute;right:14px;top:11px;color:#718399;font-size:20px}
+.cHint{font-size:8px;opacity:.8;margin-top:6px}.cStatus{padding:8px 12px;border-bottom:1px solid var(--line);font-size:9px;color:var(--muted)}
+.cResults{flex:1;overflow:auto;padding:8px;background:#f4f7fa}.cResult{width:100%;border:1px solid var(--line);background:#fff;border-radius:13px;padding:11px;margin-bottom:7px;text-align:left}
+.crComm{font-size:10px;color:var(--blue);font-weight:900}.crName{font-size:11px;font-weight:900;margin-top:2px;line-height:1.28}.crCode{font-size:8px;color:var(--muted);margin-top:5px}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}.pill{font-size:7px;background:#eef3f8;color:#42576c;border-radius:999px;padding:4px 6px;font-weight:800}
+
+/* Preview */
+.previewOverlay{position:fixed;inset:0;background:#cfd6de;z-index:180;display:none;overflow:auto}.previewOverlay.open{display:block}
+.previewTop{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;padding:8px 9px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:6px}
+.previewTop>span{text-align:center;font-size:10px;font-weight:900}.previewTop button{border:0;border-radius:9px;padding:9px;font-size:9px;font-weight:900}
+.back{background:#fff;color:var(--navy)}.pShare{background:var(--green);color:#fff}.pPdf{background:var(--blue);color:#fff}
+.stage{padding:10px 0 26px}.paperWrap{width:100%;display:flex;justify-content:center}
+#printDoc{width:216mm;min-height:279mm;background:#fff;box-shadow:0 12px 30px #102a4330;transform-origin:top center}
+
+/* Printable quotation */
+.printPage{width:216mm;min-height:279mm;background:#fff;color:#111;padding:10mm 11mm 12mm;font-family:Arial,sans-serif;font-size:8.4pt;display:flex;flex-direction:column}
+.pHead{display:grid;grid-template-columns:33mm 1fr 55mm;gap:5mm;align-items:start}.pLogo img{width:27mm;height:27mm;object-fit:contain}
+.company{font-size:14pt;font-weight:900;margin-top:2mm}.companySub{font-size:7.3pt;color:#555;line-height:1.4;margin-top:1.5mm}
+.doc{text-align:right}.doc h1{font-size:19pt;margin:0}.doc div{font-size:8pt;margin-top:1.3mm}.rule{border-top:1.2px solid #222;margin:3mm 0}
+.info{display:grid;grid-template-columns:1.18fr .82fr;gap:4mm}.box{border:1px solid #777}.boxTitle{background:#f1f1f1;border-bottom:1px solid #777;padding:1.3mm 1.8mm;font-size:7.2pt;font-weight:900}
+.boxBody{padding:1.8mm 2mm;line-height:1.44;min-height:22mm}.boxBody strong{font-size:9pt}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:1mm 2mm;padding:1.6mm 2mm;font-size:7.5pt}.mgrid .l{font-weight:800}.mgrid .v{text-align:right}
+.ptable{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:3.5mm;font-size:7.5pt}.ptable thead{display:table-header-group}.ptable th{border:1px solid #666;background:#ededed;padding:1.5mm 1.1mm;text-align:center;font-size:7pt}
+.ptable td{border-left:1px solid #777;border-right:1px solid #777;border-bottom:1px solid #aaa;padding:1.55mm 1.1mm;vertical-align:top}.ptable tr{break-inside:avoid;page-break-inside:avoid}
+.ptable .n{width:7mm;text-align:center}.ptable .code{width:31mm}.ptable .qtyc{width:14mm;text-align:right}.ptable .unit{width:27mm;text-align:right}.ptable .amount{width:29mm;text-align:right;font-weight:800}
+.after{display:grid;grid-template-columns:1fr 61mm;gap:5mm;margin-top:3.5mm}.conditions{border:1px solid #888;min-height:34mm}.ct{background:#f1f1f1;border-bottom:1px solid #888;padding:1.3mm 1.8mm;font-size:7.2pt;font-weight:900}
+.cb{padding:1.8mm;font-size:7.3pt;line-height:1.45;white-space:pre-wrap}.totals{border:1px solid #666}.trow{display:flex;justify-content:space-between;padding:1.7mm 2mm;border-bottom:1px solid #aaa;font-size:8pt}.trow:last-child{border-bottom:0}.trow.grand{font-size:10pt;font-weight:900;background:#f0f0f0;padding:2.4mm 2mm}
+.legal{font-size:6.8pt;color:#555;line-height:1.45;margin-top:3mm}.sigs{margin-top:auto;padding-top:10mm;display:grid;grid-template-columns:1fr 1fr;gap:18mm}.sig{text-align:center;border-top:1px solid #666;padding-top:1.5mm;font-size:7.3pt}.sig b{display:block;font-size:8pt}
+.pFoot{border-top:1px solid #999;margin-top:7mm;padding-top:2mm;display:flex;justify-content:space-between;color:#555;font-size:6.5pt}
+
+@media(min-width:920px){
+  body{overflow:hidden}.app{display:grid;grid-template-columns:minmax(560px,1fr) 420px;height:100vh;padding-bottom:0}.catalogCol{display:flex;flex-direction:column;min-height:0}.content{overflow:auto;padding:14px 18px}.cartBar{display:none}
+  .drawer{display:block!important;position:static;background:transparent}.panel{position:static;height:100vh;border-left:1px solid var(--line)}.panelHead .close{display:none}.actions{left:auto;width:420px}
+}
+@page{size:Letter portrait;margin:0}
+@media print{
+  .app,.gate,.previewTop,.clientOverlay{display:none!important}.previewOverlay{display:block!important;position:static!important;background:#fff!important;overflow:visible!important}
+  .stage{padding:0!important}.paperWrap{display:block!important}#printDoc{width:auto!important;min-height:0!important;transform:none!important;box-shadow:none!important}
+}
+</style>
+<script src="data/products.js"></script>
+<script src="data/clients.js"></script>
+</head>
+<body>
+
+<div id="gate" class="gate">
+  <section class="gateCard">
+    <img src="assets/toyo-logo.png" alt="Toyo Foods">
+    <h1>Cotizador Toyo Foods</h1>
+    <p>Acceso interno · Ingresa la contraseña para continuar.</p>
+    <div class="pass"><input id="password" type="password" placeholder="Contraseña"><button id="showPass" type="button">◉</button></div>
+    <button id="enter" class="enter">Entrar</button><div id="passErr" class="err"></div>
+  </section>
+</div>
+
+<div class="app">
+  <div class="catalogCol">
+    <header class="header">
+      <div class="brand"><div class="brandL"><img src="assets/toyo-logo.png"><div><b>Lista de Precios</b><small>Toyo Foods · Cotizador móvil</small></div></div><button id="modeBtn" class="modeBtn">Mayoreo ▾</button></div>
+      <div class="search"><input id="search" placeholder="Buscar producto o código…" autocomplete="off"><span>⌕</span></div>
+      <div class="chips">
+        <button class="chip active" data-filter="all">Todos</button>
+        <button class="chip" data-filter="under100">Menos de $100</button>
+        <button class="chip" data-filter="100to500">$100–$500</button>
+        <button class="chip" data-filter="over500">Más de $500</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="meta"><b id="resultCount">0 productos</b><span>Lista SAP</span></div>
+      <section id="productList" class="list"></section>
+      <button id="more" class="more">Mostrar más</button>
+    </main>
+
+    <div class="cartBar">
+      <div><b><span id="cartCount">0</span> piezas · <span id="cartTotal">$0.00 MXP</span></b><small>Cotización actual</small></div>
+      <button id="openQuote">Ver cotización</button>
+    </div>
+  </div>
+
+  <div id="drawer" class="drawer">
+    <section class="panel">
+      <div class="panelHead"><div><h2>Nueva cotización</h2><small id="quoteMeta"></small></div><button id="closeQuote" class="close">✕</button></div>
+      <div class="qbody">
+        <div class="section">
+          <div class="stitle">CLIENTE</div>
+          <button id="chooseClient" class="clientBtn"><span>👤 Seleccionar cliente<small>Buscar por código, nombre, nombre comercial o RFC</small></span><span>›</span></button>
+          <div id="clientCard" class="clientCard hidden"></div>
+          <div class="form">
+            <input id="contact" placeholder="Contacto (opcional)">
+            <input id="phone" placeholder="Teléfono / correo (opcional)">
+            <input id="address" class="wide" placeholder="Dirección / lugar de entrega (opcional)">
+            <select id="valid" class="wide"><option>Vigencia 7 días</option><option>Vigencia 15 días</option><option>Vigencia 30 días</option></select>
+          </div>
+        </div>
+
+        <div class="section"><div class="stitle">PRODUCTOS</div><div id="qitems" class="qitems"></div></div>
+
+        <div class="calc">
+          <div class="crow"><span>Subtotal</span><b id="subtotal">$0.00 MXP</b></div>
+          <div class="crow"><span>Descuento global</span><span><input id="discount" class="disc" type="number" min="0" max="100" value="0"> %</span></div>
+          <div class="crow"><span>Descuento</span><b id="discountAmt">-$0.00 MXP</b></div>
+          <div class="crow total"><span>Total</span><span id="grand">$0.00 MXP</span></div>
+        </div>
+
+        <div class="section"><div class="stitle">NOTAS / CONDICIONES</div><div class="form"><textarea id="notes" class="wide" placeholder="Entrega, observaciones, condiciones especiales…"></textarea></div></div>
+      </div>
+
+      <div class="actions">
+        <button id="newQuote" class="new">Nueva</button>
+        <button id="preview" class="preview">Vista previa</button>
+        <button id="shareImage" class="share">Compartir imagen</button>
+        <button id="pdf" class="pdf">PDF / imprimir</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="clientOverlay" class="clientOverlay">
+  <header class="cHead">
+    <div class="cTop"><button id="closeClients">←</button><div><b>Seleccionar cliente</b><small id="clientDb"></small></div></div>
+    <div class="cSearch"><input id="clientSearch" placeholder="Código, cliente, comercial o RFC…" autocomplete="off"><span>⌕</span></div>
+    <div class="cHint">Escribe al menos 2 caracteres. Mostramos hasta 60 resultados para mantener velocidad en móvil.</div>
+  </header>
+  <div id="clientStatus" class="cStatus">Busca un cliente para continuar.</div>
+  <main id="clientResults" class="cResults"><div class="empty">Empieza a escribir para buscar.</div></main>
+</div>
+
+<div id="previewOverlay" class="previewOverlay">
+  <div class="previewTop"><button id="backPreview" class="back">← Volver</button><span>Vista previa</span><div><button id="sharePreview" class="pShare">Imagen</button> <button id="printPreview" class="pPdf">PDF</button></div></div>
+  <div class="stage"><div class="paperWrap"><div id="printDoc"></div></div></div>
+</div>
+
+<script>
+const PRODUCTS=window.TOYO_PRODUCTS||[], CLIENTS=window.TOYO_CLIENTS||[];
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=(s='')=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const fmt=(n,c='MXP')=>'$'+Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})+' '+c;
+const today=()=>new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
+const newFolio=()=> 'COT-'+new Date().toISOString().slice(2,10).replaceAll('-','')+'-'+Math.floor(100+Math.random()*900);
+
+const PCODE=0,PNAME=1,PMAY=2,PBRUTO=3,PMON=4;
+const CCODE=0,CNAME=1,CCOMM=2,CRFC=3,CSELLER=4,CTERMS=5,CSALE=6;
+let mode='wholesale', filterMode='all', limit=60, cart={}, selectedClient=null, folio=newFolio(), clientTimer=null;
+
+function pv(p){return mode==='wholesale'?p[PMAY]:p[PBRUTO]}
+function cv(i,f='—'){if(!selectedClient)return f;const v=String(selectedClient[i]||'').trim();return v||f}
+function cvesc(i,f='—'){return esc(cv(i,f))}
+
+/* Password */
+const ACCESS_HASH='3185c0dd491b71608d78870b74d539916ef51c617d3b25eca2ce19fddd9b4f03';
+async function hash(v){try{const b=new TextEncoder().encode(v),d=await crypto.subtle.digest('SHA-256',b);return [...new Uint8Array(d)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch{return ''}}
+async function login(){
+  const val=$('#password').value, h=await hash(val);
+  const ok=(h&&h===ACCESS_HASH)||(!h&&val==='TOYO2026');
+  if(ok){sessionStorage.setItem('toyo_ok','1');$('#gate').classList.add('hidden');$('#password').value='';$('#passErr').textContent=''}
+  else{$('#passErr').textContent='Contraseña incorrecta.';$('#password').select()}
+}
+$('#enter').onclick=login;$('#password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+$('#showPass').onclick=()=>{const i=$('#password');i.type=i.type==='password'?'text':'password';i.focus()};
+if(sessionStorage.getItem('toyo_ok')==='1')$('#gate').classList.add('hidden');
+
+/* Products */
+function filteredProducts(){
+  const t=norm($('#search').value.trim());
+  return PRODUCTS.filter(p=>{
+    const v=pv(p);
+    const text=!t||norm((p[PCODE]||'')+' '+(p[PNAME]||'')).includes(t);
+    const f=filterMode==='all'||(filterMode==='under100'&&v<100)||(filterMode==='100to500'&&v>=100&&v<=500)||(filterMode==='over500'&&v>500);
+    return text&&f;
+  });
+}
+function renderProducts(){
+  const arr=filteredProducts();
+  $('#resultCount').textContent=arr.length.toLocaleString('es-MX')+' productos';
+  $('#productList').innerHTML=arr.slice(0,limit).map(p=>`<article class="product">
+    <div><div class="pcode">${esc(p[PCODE])}</div><div class="pname">${esc(p[PNAME])}</div>
+    <div class="priceRow"><span class="price">${fmt(pv(p),p[PMON])}</span><span class="alt">${mode==='wholesale'?'Bruto: '+fmt(p[PBRUTO],p[PMON]):'Mayoreo: '+fmt(p[PMAY],p[PMON])}</span></div></div>
+    <button class="add" data-code="${esc(p[PCODE])}">+</button></article>`).join('')||'<div class="empty">No encontré productos.</div>';
+  $('#more').style.display=arr.length>limit?'block':'none';
+  $$('.add').forEach(b=>b.onclick=()=>addProduct(b.dataset.code));
+}
+function addProduct(code){cart[code]=(cart[code]||0)+1;renderCart()}
+$('#search').oninput=()=>{limit=60;renderProducts()};
+$('#more').onclick=()=>{limit+=60;renderProducts()};
+$('#modeBtn').onclick=()=>{mode=mode==='wholesale'?'gross':'wholesale';$('#modeBtn').textContent=mode==='wholesale'?'Mayoreo ▾':'Bruto ▾';renderProducts();renderCart()};
+$$('.chip').forEach(b=>b.onclick=()=>{filterMode=b.dataset.filter;$$('.chip').forEach(x=>x.classList.toggle('active',x===b));limit=60;renderProducts()});
+
+/* Client search */
+function openClients(){$('#clientOverlay').classList.add('open');$('#clientSearch').value='';$('#clientStatus').textContent='Busca un cliente para continuar.';$('#clientResults').innerHTML='<div class="empty">Empieza a escribir para buscar.</div>';setTimeout(()=>$('#clientSearch').focus(),80)}
+function closeClients(){$('#clientOverlay').classList.remove('open')}
+function renderClient(){
+  const card=$('#clientCard');
+  if(!selectedClient){card.classList.add('hidden');$('#chooseClient').classList.remove('hidden');return}
+  $('#chooseClient').classList.add('hidden');card.classList.remove('hidden');
+  card.innerHTML=`<div class="clientTop"><div><strong>${cvesc(CNAME)}</strong>${cv(CCOMM,'')?`<div class="commercial">${cvesc(CCOMM,'')}</div>`:''}</div><button id="changeClient" class="change">Cambiar</button></div>
+  <div class="cmeta"><div><b>Código</b>${cvesc(CCODE)}</div><div><b>RFC</b>${cvesc(CRFC)}</div><div><b>Vendedor</b>${cvesc(CSELLER)}</div><div><b>Condiciones de pago</b>${cvesc(CTERMS)}</div><div><b>Forma de venta</b>${cvesc(CSALE)}</div></div>`;
+  $('#changeClient').onclick=openClients;
+}
+function runClientSearch(){
+  const t=norm($('#clientSearch').value.trim());
+  if(t.length<2){$('#clientStatus').textContent='Escribe al menos 2 caracteres.';$('#clientResults').innerHTML='<div class="empty">Escribe al menos 2 caracteres.</div>';return}
+  const hits=[];
+  for(let i=0;i<CLIENTS.length;i++){
+    const c=CLIENTS[i];
+    const hay=((c[CCODE]||'')+' '+(c[CNAME]||'')+' '+(c[CCOMM]||'')+' '+(c[CRFC]||'')).toLowerCase();
+    if(hay.includes(t)){hits.push([i,c]);if(hits.length>=60)break}
+  }
+  $('#clientStatus').textContent=hits.length?`Mostrando ${hits.length}${hits.length===60?' primeras':''} coincidencias`:'Sin coincidencias';
+  $('#clientResults').innerHTML=hits.length?hits.map(([i,c])=>`<button class="cResult" data-i="${i}">
+    ${c[CCOMM]?`<div class="crComm">${esc(c[CCOMM])}</div>`:''}<div class="crName">${esc(c[CNAME]||'Sin nombre')}</div>
+    <div class="crCode">${esc(c[CCODE]||'—')} · RFC ${esc(c[CRFC]||'—')}</div>
+    <div class="pills"><span class="pill">${esc(c[CSELLER]||'Sin vendedor')}</span><span class="pill">${esc(c[CTERMS]||'Sin condición')}</span><span class="pill">${esc(c[CSALE]||'Sin forma de venta')}</span></div></button>`).join(''):'<div class="empty">No encontré clientes con esa búsqueda.</div>';
+  $$('.cResult').forEach(b=>b.onclick=()=>{selectedClient=CLIENTS[Number(b.dataset.i)];renderClient();closeClients()});
+}
+$('#chooseClient').onclick=openClients;$('#closeClients').onclick=closeClients;
+$('#clientSearch').oninput=()=>{clearTimeout(clientTimer);clientTimer=setTimeout(runClientSearch,160)};
+$('#clientDb').textContent=CLIENTS.length.toLocaleString('es-MX')+' clientes disponibles';
+
+/* Quote */
+function totals(){
+  let sub=0,pieces=0;
+  for(const [code,q] of Object.entries(cart)){const p=PRODUCTS.find(x=>x[PCODE]===code);if(!p)continue;sub+=pv(p)*q;pieces+=q}
+  const d=Math.min(100,Math.max(0,Number($('#discount').value)||0)), da=sub*d/100;
+  return {sub,pieces,d,da,total:sub-da}
+}
+function renderCart(){
+  let html='';
+  for(const [code,q] of Object.entries(cart)){
+    const p=PRODUCTS.find(x=>x[PCODE]===code);if(!p)continue;
+    html+=`<div class="qitem"><div><b>${esc(p[PNAME])}</b><small>${esc(p[PCODE])} · ${fmt(pv(p),p[PMON])} c/u</small></div>
+    <div class="qty"><button data-c="${esc(code)}" data-d="-1">−</button><strong>${q}</strong><button data-c="${esc(code)}" data-d="1">+</button><button class="rm" data-r="${esc(code)}">×</button></div></div>`;
+  }
+  $('#qitems').innerHTML=html||'<div class="empty" style="padding:25px 10px">Agrega productos desde la lista.</div>';
+  const t=totals();$('#subtotal').textContent=fmt(t.sub);$('#discountAmt').textContent='-'+fmt(t.da);$('#grand').textContent=fmt(t.total);$('#cartCount').textContent=t.pieces;$('#cartTotal').textContent=fmt(t.total);
+  $$('[data-d]').forEach(b=>b.onclick=()=>{const c=b.dataset.c;cart[c]+=Number(b.dataset.d);if(cart[c]<=0)delete cart[c];renderCart()});
+  $$('[data-r]').forEach(b=>b.onclick=()=>{delete cart[b.dataset.r];renderCart()});
+}
+$('#discount').oninput=renderCart;
+$('#quoteMeta').textContent=folio+' · '+today();
+$('#openQuote').onclick=()=>$('#drawer').classList.add('open');$('#closeQuote').onclick=()=>$('#drawer').classList.remove('open');
+
+function sv(id,f='—'){const v=($(id).value||'').trim();return v?esc(v):f}
+function buildPrint(){
+  const entries=Object.entries(cart),t=totals();
+  const rows=entries.map(([code,q],i)=>{const p=PRODUCTS.find(x=>x[PCODE]===code);if(!p)return'';return `<tr><td class="n">${i+1}</td><td class="code">${esc(p[PCODE])}</td><td>${esc(p[PNAME])}</td><td class="qtyc">${q}</td><td class="unit">${fmt(pv(p),p[PMON]).replace(' MXP','')}</td><td class="amount">${fmt(pv(p)*q,p[PMON]).replace(' MXP','')}</td></tr>`}).join('');
+  $('#printDoc').innerHTML=`<article class="printPage">
+    <header class="pHead"><div class="pLogo"><img src="assets/toyo-logo.png"></div><div><div class="company">COMERCIAL TOYO S.A. DE C.V.</div><div class="companySub">Cotización comercial de productos<br>Toyo Foods</div></div><div class="doc"><h1>COTIZACIÓN</h1><div>Folio: <b>${esc(folio)}</b></div></div></header>
+    <div class="rule"></div>
+    <section class="info">
+      <div class="box"><div class="boxTitle">COTIZADO A / CLIENTE</div><div class="boxBody"><strong>${cvesc(CNAME,'CLIENTE POR DEFINIR')}</strong><br>Nombre comercial: ${cvesc(CCOMM)}<br>Código: ${cvesc(CCODE)}<br>RFC: ${cvesc(CRFC)}<br>Contacto: ${sv('#contact')}<br>Dirección / entrega: ${sv('#address')}<br>Tel. / correo: ${sv('#phone')}</div></div>
+      <div class="box"><div class="boxTitle">DATOS DE LA COTIZACIÓN</div><div class="mgrid"><span class="l">Fecha:</span><span class="v">${today()}</span><span class="l">Vendedor:</span><span class="v">${cvesc(CSELLER)}</span><span class="l">Condiciones:</span><span class="v">${cvesc(CTERMS)}</span><span class="l">Forma de venta:</span><span class="v">${cvesc(CSALE)}</span><span class="l">Vigencia:</span><span class="v">${sv('#valid')}</span><span class="l">Lista:</span><span class="v">${mode==='wholesale'?'Mayoreo':'Bruto'}</span><span class="l">Moneda:</span><span class="v">MXP</span></div></div>
+    </section>
+    <table class="ptable"><thead><tr><th class="n">No.</th><th class="code">CÓDIGO</th><th>DESCRIPCIÓN</th><th class="qtyc">CANT.</th><th class="unit">PRECIO UNIT.</th><th class="amount">TOTAL</th></tr></thead><tbody>${rows||'<tr><td colspan="6" style="text-align:center;padding:8mm">Sin productos agregados.</td></tr>'}</tbody></table>
+    <section class="after"><div><div class="conditions"><div class="ct">CONDICIONES / COMENTARIOS</div><div class="cb">${sv('#notes','Precios expresados en MXP. Cotización sujeta a disponibilidad y vigencia indicada.')}</div></div><div class="legal">Esta cotización es informativa y no constituye factura. Los precios y disponibilidad deberán confirmarse al momento de colocar el pedido.</div></div>
+      <div class="totals"><div class="trow"><span>Subtotal</span><b>${fmt(t.sub)}</b></div><div class="trow"><span>Descuento ${t.d.toFixed(2)}%</span><b>-${fmt(t.da)}</b></div><div class="trow grand"><span>TOTAL</span><span>${fmt(t.total)}</span></div></div></section>
+    <section class="sigs"><div class="sig"><b>${cvesc(CSELLER,'Vendedor')}</b>Elaboró / Vendedor</div><div class="sig"><b>${cvesc(CCOMM,cv(CNAME,'Cliente'))}</b>Aceptación del cliente</div></section>
+    <footer class="pFoot"><span>Toyo Foods · Cotización comercial</span><span>${esc(folio)} · ${today()}</span></footer>
+  </article>`;
+  scalePreview();
+}
+function scalePreview(){
+  if(!$('#previewOverlay').classList.contains('open'))return;
+  const doc=$('#printDoc');doc.style.transform='none';doc.style.marginBottom='0';
+  if(innerWidth<900){const s=Math.min(1,(innerWidth-12)/816);doc.style.transform=`scale(${s})`;doc.style.marginBottom=`-${(1-s)*1056}px`}
+}
+function readyOutput(){if(!selectedClient){alert('Selecciona un cliente antes de generar la cotización.');return false}if(!Object.keys(cart).length){alert('Agrega al menos un producto.');return false}return true}
+$('#preview').onclick=()=>{if(!readyOutput())return;buildPrint();$('#previewOverlay').classList.add('open');setTimeout(scalePreview,20)};
+$('#backPreview').onclick=()=>$('#previewOverlay').classList.remove('open');
+$('#pdf').onclick=()=>{if(!readyOutput())return;buildPrint();window.print()};
+$('#printPreview').onclick=()=>{buildPrint();window.print()};
+addEventListener('resize',scalePreview);
+
+$('#newQuote').onclick=()=>{if(Object.keys(cart).length&&!confirm('¿Crear una cotización nueva?'))return;cart={};selectedClient=null;folio=newFolio();$('#quoteMeta').textContent=folio+' · '+today();['#contact','#phone','#address','#notes'].forEach(x=>$(x).value='');$('#discount').value=0;renderClient();renderCart()};
+
+/* Image share */
+function rounded(ctx,x,y,w,h,r,fill){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):ctx.rect(x,y,w,h);ctx.fillStyle=fill;ctx.fill()}
+function text(ctx,s,x,y,size=22,weight='400',align='left',color='#172536'){ctx.font=`${weight} ${size}px Arial`;ctx.textAlign=align;ctx.textBaseline='top';ctx.fillStyle=color;ctx.fillText(String(s??''),x,y)}
+function wrap(ctx,s,max){const words=String(s||'').split(/\s+/),lines=[];let line='';for(const w of words){const t=line?line+' '+w:w;if(ctx.measureText(t).width>max&&line){lines.push(line);line=w}else line=t}if(line)lines.push(line);return lines}
+function loadLogo(){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src='assets/toyo-logo.png'})}
+function quoteRows(){return Object.entries(cart).map(([code,q])=>{const p=PRODUCTS.find(x=>x[PCODE]===code);return p?{code:p[PCODE],name:p[PNAME],qty:q,unit:pv(p),total:pv(p)*q}:null}).filter(Boolean)}
+async function canvasPage(rows,page,pages,logo){
+  const W=1080,H=1528,M=56,c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#0e3a6d';ctx.fillRect(0,0,W,180);rounded(ctx,M,33,112,112,22,'#fff');ctx.drawImage(logo,M+7,40,98,98);
+  text(ctx,'COMERCIAL TOYO S.A. DE C.V.',195,45,32,'700','left','#fff');text(ctx,'Cotización comercial',195,88,21,'400','left','#d7e8f8');text(ctx,'COTIZACIÓN',W-M,42,38,'700','right','#fff');text(ctx,folio,W-M,96,20,'700','right','#d7e8f8');text(ctx,`Página ${page}/${pages}`,W-M,128,16,'400','right','#c4d9ec');
+  let y=215;
+  if(page===1){rounded(ctx,M,y,W-2*M,225,18,'#f4f7fa');text(ctx,'CLIENTE',M+20,y+18,18,'700','left','#728299');text(ctx,cv(CNAME,'CLIENTE POR DEFINIR'),M+20,y+50,28,'700','left','#0e3a6d');if(cv(CCOMM,'—')!=='—')text(ctx,cv(CCOMM),M+20,y+88,21,'700','left','#1f6feb');
+    text(ctx,`Código: ${cv(CCODE)}`,M+20,y+132,17);text(ctx,`RFC: ${cv(CRFC)}`,M+20,y+161,17);text(ctx,`Vendedor: ${cv(CSELLER)}`,570,y+28,17,'700');text(ctx,`Condiciones: ${cv(CTERMS)}`,570,y+61,17);text(ctx,`Forma de venta: ${cv(CSALE)}`,570,y+94,17);text(ctx,`Fecha: ${today()}`,570,y+127,17);text(ctx,$('#valid').value,570,y+160,17);y+=258}else{ text(ctx,cv(CCOMM,cv(CNAME,'Cliente')),M,y,22,'700','left','#0e3a6d');text(ctx,`RFC ${cv(CRFC)} · ${cv(CTERMS)} · ${cv(CSALE)}`,M,y+32,16,'400','left','#728299');y+=72}
+  ctx.fillStyle='#e9eef4';ctx.fillRect(M,y,W-2*M,46);text(ctx,'CÓDIGO',M+9,y+13,15,'700');text(ctx,'DESCRIPCIÓN',270,y+13,15,'700');text(ctx,'CANT.',758,y+13,15,'700','right');text(ctx,'P. UNIT.',840,y+13,15,'700','right');text(ctx,'TOTAL',W-M-9,y+13,15,'700','right');y+=46;
+  rows.forEach((r,i)=>{const rh=72;if(i%2){ctx.fillStyle='#fafbfd';ctx.fillRect(M,y,W-2*M,rh)}text(ctx,r.code,M+9,y+14,14,'700','left','#1f6feb');ctx.font='700 16px Arial';wrap(ctx,r.name,430).slice(0,2).forEach((ln,j)=>text(ctx,ln,270,y+10+j*22,16,'700'));text(ctx,r.qty,758,y+18,17,'700','right');text(ctx,'$'+Number(r.unit).toLocaleString('es-MX',{minimumFractionDigits:2}),840,y+18,16,'400','right');text(ctx,'$'+Number(r.total).toLocaleString('es-MX',{minimumFractionDigits:2}),W-M-9,y+18,17,'700','right');ctx.strokeStyle='#e2e8ef';ctx.beginPath();ctx.moveTo(M,y+rh);ctx.lineTo(W-M,y+rh);ctx.stroke();y+=rh});
+  if(page===pages){const t=totals();y=Math.max(y+22,1100);rounded(ctx,M,y,575,198,15,'#f7f9fb');text(ctx,'CONDICIONES / COMENTARIOS',M+18,y+16,16,'700','left','#728299');ctx.font='400 16px Arial';wrap(ctx,$('#notes').value||'Precios sujetos a disponibilidad y vigencia indicada.',530).slice(0,6).forEach((ln,i)=>text(ctx,ln,M+18,y+48+i*23,16));
+    rounded(ctx,670,y,W-M-670,198,15,'#f4f7fa');text(ctx,'Subtotal',690,y+23,17);text(ctx,fmt(t.sub),W-M-18,y+23,17,'700','right');text(ctx,`Descuento ${t.d.toFixed(2)}%`,690,y+65,17);text(ctx,'-'+fmt(t.da),W-M-18,y+65,17,'700','right');ctx.strokeStyle='#cbd6e2';ctx.beginPath();ctx.moveTo(690,y+107);ctx.lineTo(W-M-18,y+107);ctx.stroke();text(ctx,'TOTAL',690,y+129,24,'700','left','#0e3a6d');text(ctx,fmt(t.total),W-M-18,y+126,25,'700','right','#0e3a6d')}
+  text(ctx,'Toyo Foods · Cotización comercial',M,H-46,14,'400','left','#75879a');text(ctx,`${folio} · ${today()}`,W-M,H-46,14,'400','right','#75879a');return c
+}
+async function shareImage(btn){
+  if(!readyOutput())return;
+  const rows=quoteRows(),chunks=[];let i=0,page=1;while(i<rows.length){const n=page===1?10:14;chunks.push(rows.slice(i,i+n));i+=n;page++}
+  const logo=await loadLogo(),files=[];btn.disabled=true;const old=btn.textContent;btn.textContent='Generando…';
+  try{for(let p=0;p<chunks.length;p++){const c=await canvasPage(chunks[p],p+1,chunks.length,logo);const blob=await new Promise(r=>c.toBlob(r,'image/png',.96));files.push(new File([blob],`${folio}_pagina_${p+1}.png`,{type:'image/png'}))}
+    if(navigator.share&&(!navigator.canShare||navigator.canShare({files}))){await navigator.share({title:`Cotización ${folio}`,text:`Cotización Toyo Foods · ${cv(CCOMM,cv(CNAME,'Cliente'))}`,files})}
+    else{files.forEach(f=>{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove()});alert('La imagen se descargó para que puedas compartirla.')}
+  }catch(e){if(e?.name!=='AbortError'){console.error(e);alert('No fue posible compartir la imagen. Puedes usar PDF / imprimir.')}}finally{btn.disabled=false;btn.textContent=old}
+}
+$('#shareImage').onclick=()=>shareImage($('#shareImage'));$('#sharePreview').onclick=()=>shareImage($('#sharePreview'));
+
+renderClient();renderProducts();renderCart();
+</script>
+</body>
+</html>
