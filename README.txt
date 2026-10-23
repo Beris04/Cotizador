@@ -1,13 +1,29 @@
-COTIZADOR TOYO FOODS V7
+COTIZADOR TOYO FOODS V8 PREMIUM
 
-- Productos: 8,759
-- Clientes: 64,509
-- Prospectos: permitidos sin existir en la base.
-- Solo 3 botones de precio: Lista 3, Lista 4 y Precio Bruto.
-- Lista 4 obtenida del archivo SN GDL SEP 26 (2).xlsx.
-- Productos con precio de Lista 4 identificado: 1,677
-- Para artículos sin dato de Lista 4 en el archivo, se usa Lista 3 como respaldo y la app lo indica.
-- Contraseña: TOYO2026
-- Tipografía más ligera y menos uso de negritas.
+Versión final basada en el diseño aprobado "Opción 2".
 
-Para GitHub Pages, sube TODO el contenido del ZIP respetando las carpetas data/ y assets/.
+Incluye:
+- Interfaz premium, ligera y con menos negritas.
+- Mobile-first.
+- Contraseña: TOYO2026.
+- Clientes registrados y prospectos.
+- 3 opciones de precio:
+  * Lista 3 · Mayoreo con impuestos
+  * Lista 4 · Precio especial
+  * Precio bruto
+- Búsqueda por código o descripción.
+- Cantidades y carrito/cotización.
+- Descuento global y comentarios.
+- Vista previa formal.
+- PDF / imprimir.
+- Compartir cotización como imagen PNG desde celular.
+- Conserva el formato formal de la cotización en imagen/PDF.
+
+IMPORTANTE:
+La base de Lista 4 es la que ya estaba integrada en V7. Cuando un artículo no tiene un precio de Lista 4 identificado, la interfaz lo marca y mantiene el respaldo que venía en esa base.
+
+GITHUB PAGES:
+Sube TODO el contenido del ZIP a la raíz del repositorio respetando:
+- index.html
+- data/
+- assets/
